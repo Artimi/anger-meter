@@ -21,3 +21,4 @@ class Comment(scrapy.Item):
     score_plus = scrapy.Field()
     score_minus = scrapy.Field()
     datetime = scrapy.Field()
+    article_url = scrapy.Field()
