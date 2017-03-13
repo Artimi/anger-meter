@@ -7,9 +7,13 @@ number = re.compile(r'\d+')
 
 class IdnesSpider(scrapy.Spider):
     name = 'idnes'
-    start_urls = ['http://ekonomika.idnes.cz/vyroci-provozu-railjetu-u-ceskych-drah-d9h-/eko-doprava.aspx?c=A170310_203809_eko-doprava_suj']
+    start_urls = ['http://zpravy.idnes.cz/archiv.aspx?strana=1']
 
     def parse(self, response):
+        for article_url in response.xpath('//*[@id="list-art-count"]/*/div[contains(@class, "fl")]/a/@href').extract():
+            yield scrapy.Request(article_url, callback=self.parse_article)
+
+    def parse_article(self, response):
         article = Article()
         article['title'] = response.xpath('//title/text()').extract()[0]
         article['url'] = response.url
