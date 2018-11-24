@@ -4,27 +4,22 @@
 #
 # Don't forget to add your pipeline to the ITEM_PIPELINES setting
 # See: http://doc.scrapy.org/en/latest/topics/item-pipeline.html
-import dataset
+import boto3
+
 import crawlers.items
-import sqlalchemy.exc
 
 
 class DBPipeline(object):
+
     def open_spider(self, spider):
-        self.db = dataset.connect('postgresql://postgres:postgres@localhost:5432/anger-meter')
-        self.article = self.db['article']
-        self.comment = self.db['comment']
+        self._dynamodb = boto3.resource('dynamodb', region_name='eu-central-1')
+        self._articles = self._dynamodb.Table('articles')
+        self._comments = self._dynamodb.Table('comments')
 
     def process_item(self, item, spider):
         if isinstance(item, crawlers.items.Article):
-            try:
-                self.article.insert(item)
-            except sqlalchemy.exc.IntegrityError:
-                self.article.update(item, ['url'])
+            self._articles.put_item(Item=dict(item))
         elif isinstance(item, crawlers.items.Comment):
-            try:
-                self.comment.insert(item)
-            except sqlalchemy.exc.IntegrityError:
-                self.comment.update(item, ['article_url', 'author', 'datetime'])
+            self._comments.put_item(Item=dict(item))
 
         return item

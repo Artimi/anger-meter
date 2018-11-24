@@ -12,13 +12,15 @@ class Article(scrapy.Item):
     title = scrapy.Field()
     url = scrapy.Field()
     content = scrapy.Field()
-    datetime = scrapy.Field()
+    timestamp = scrapy.Field()
 
 
 class Comment(scrapy.Item):
     author = scrapy.Field()
+    author_id = scrapy.Field()
+    comment_id = scrapy.Field()
     content = scrapy.Field()
     score_plus = scrapy.Field()
     score_minus = scrapy.Field()
-    datetime = scrapy.Field()
+    timestamp = scrapy.Field()
     article_url = scrapy.Field()
